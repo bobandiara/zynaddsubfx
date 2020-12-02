@@ -474,8 +474,19 @@ static const Ports globalPorts = {
 #define rChangeCb obj->last_update_timestamp = obj->time->time();
 static const Ports adPorts = {//XXX 16 should not be hard coded
     rSelf(ADnoteParameters),
-    rPaste,
-    rArrayPaste,
+    {"paste:b", rProp(internal) rDoc("paste port"), 0,
+    [](const char *m, rtosc::RtData &d){
+        printf("rPaste...\n");
+        rObject &paste = **(rObject **)rtosc_argument(m,0).b.data;
+        rObject &o = *(rObject*)d.obj;
+        o.paste(paste);}},
+    {"paste-array:bi", rProp(internal) rDoc("array paste port"), 0,
+    [](const char *m, rtosc::RtData &d){
+        printf("rArrayPaste...\n");
+        rObject &paste = **(rObject **)rtosc_argument(m,0).b.data;
+        int field = rtosc_argument(m,1).i;
+        rObject &o = *(rObject*)d.obj;
+        o.pasteArray(paste,field);}},
     rRecurs(VoicePar, NUM_VOICES),
     {"VoicePar#" STRINGIFY(NUM_VOICES) "/Enabled::T:F",
      rProp(parameter) rShort("enable") rDoc("Voice Enable")
@@ -1167,7 +1178,7 @@ void ADnoteVoiceParam::paste(ADnoteVoiceParam &a)
     copy(PFMEnabled);
     copy(PFMFixedFreq);
 
-    RCopy(OscilGn);
+//    RCopy(OscilGn);
 
 
     copy(PPanning);
@@ -1226,7 +1237,7 @@ void ADnoteVoiceParam::paste(ADnoteVoiceParam &a)
 
     RCopy(FMFreqEnvelope);
 
-    RCopy(FmGn);
+//    RCopy(FmGn);
 
     if ( time ) {
         last_update_timestamp = time->time();
